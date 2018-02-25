@@ -37,7 +37,7 @@ class qcgzxw extends WP_Widget {
 		echo $result;
 		?>
 			<div class="upload_box" style = "padding: 20px 0 20px 10px">
-			<input type="file" id="image" multiple="multiple" >
+			<input type="file" id="image" accept="image/*" multiple="multiple" >
 				<div id = "show" style="widht:100%;height:100%;word-wrap: break-word">
 				<p class = "text-justify" id="urls"></p>
 					<div id = "mul-image"></div>
@@ -52,6 +52,6 @@ function qcgzxw(){
 	// 注册小工具
 	register_widget('qcgzxw');
 }
-
 add_action('widgets_init','qcgzxw');
+
 ?>
