@@ -2,37 +2,43 @@
 /*
 Plugin Name: SM.MS图床外链小工具
 Plugin URI: https://www.qcgzxw.cn/2555.html
-Description: 小文博客独自开发的图床插件，用于WordPress博客添加图床上传小工具。
+Description: 小文博客独自开发的图床插件，用于WordPress博客添加 图床上传小工具、评论处图片上传按钮、文章编辑处图片上传按钮。
 Author: 小文博客
 Author URI: https://www.qcgzxw.cn/
-Version: 3.0
+Version: 4.0
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+自定义小工具CSS样式部分
 */
 define( 'SMMS_URL', plugin_dir_url( __FILE__ ) ); 
-define( 'SMMS_VERSION', "3.0");
+define( 'SMMS_VERSION', "4.0");
 define( 'VERSION_CHECK_URL',"https://www.qcgzxw.cn/plugin/?name=qcgzxw_smms");
 include("SMMS-UPLOADER-WIDGETS.php");
 include("SMMS-UPLOADER-COMMENTS.php");
-function qcgzxw_scripts() {  
+function qcgzxw_scripts_css() {  
 wp_deregister_script('jquery');
 wp_register_script('jquery', SMMS_URL . 'js/jquery.min.js', false, SMMS_VERSION);
 wp_enqueue_script( 'jquery' );
-wp_enqueue_script( 'smms-js', SMMS_URL . 'js/widget.min.js', '1.0', array(), true, SMMS_VERSION); 
-if(is_single() || is_page())wp_enqueue_script( 'smms-comment-js', SMMS_URL . 'js/button.min.js', '1.0', array(), true, SMMS_VERSION); 
+wp_enqueue_script( 'smms-js', SMMS_URL . 'js/widget.min.js', array(), true, SMMS_VERSION); 
+if(is_single() || is_page())wp_enqueue_script( 'smms-comment-js', SMMS_URL . 'js/comment.min.js', array(), true, SMMS_VERSION); 
 wp_enqueue_style( 'smms-widget-css', SMMS_URL . 'css/smms.diy.css', array(),SMMS_VERSION); 
 wp_enqueue_style( 'bootstrap', SMMS_URL . 'css/bootstrap.min.css', array(), SMMS_VERSION); 
 }
-add_action('wp_enqueue_scripts', 'qcgzxw_scripts');
+function admin_scripts_css() {  
+wp_enqueue_script( 'admin-content-js', SMMS_URL . 'js/content.min.js', array(), true, SMMS_VERSION); 
+wp_enqueue_style( 'admin-content-css', SMMS_URL . 'css/input.min.css', array(),SMMS_VERSION); 
+}
+add_action('wp_enqueue_scripts', 'qcgzxw_scripts_css');
 add_action('widgets_init','qcgzxw');
 //功能启用
 $Uploader = get_option('SMMS_DATA'); 
-if($Uploader['Widget'])
+if($Uploader['Content'])
 {
-	
+	add_action('admin_head', 'admin_scripts_css');
+	add_action('media_buttons', 'admin_upload_img');  
 }
 if($Uploader['Comment'])
 {
-	add_filter('comment_form_after', 'zsky_upload_img'); 
+	add_filter('comment_form', 'comment_upload_img'); 
 }
 if($Uploader['Donate'])
 {
@@ -53,7 +59,7 @@ function SMMS_UPLOADER_LINKS( $actions, $plugin_file )
 	if (!isset($plugin))
 		$plugin = plugin_basename(__FILE__);
 	if ($plugin == $plugin_file) {
-			$settings	= array('settings' => '<a href="options-general.php?page=SMMS-UPLOADER-OPTIONS">' . __('Settings') . '</a>');
+			$settings	= array('settings' => '<a href="options-general.php?page=SMMS-UPLOADER-OPTIONS">插件设置</a>');
 			$site_link	= array('support' => '<a href="https://github.com/qcgzxw/SMMS-UPLOADER" target="_blank">使用说明</a>');
 			$actions 	= array_merge($settings, $actions);
 			$actions	= array_merge($site_link, $actions);
@@ -66,7 +72,7 @@ function SMMS_options_default_options(){
 	$Uploader = get_option('SMMS_DATA');//获取选项
 	if( $Uploader == '' ){   
 		$Uploader = array(//设置默认数据
-			'Widget' => 'true',
+			'Content' => '',
 			'Comment' => '',
 			'Donate' => '',
 		);
@@ -84,7 +90,7 @@ function my_plugin_options() {
 	if(isset($_POST['DataSubmit']))
 	{
 		$Uploader = array( 
-			'Widget' => trim(@$_POST['widget']),
+			'Content' => trim(@$_POST['content']),
 			'Comment' => trim(@$_POST['comment']),
 			'Donate' => trim(@$_POST['donate']),
 			);
@@ -98,7 +104,7 @@ function my_plugin_options() {
 		echo "</div><style>.fb{font-weight:bold;}.f12{font-size:12px;}..f16{font-size:16px;}.f18{font-size:18px;}..fl{float:left;}.fr{float:right;margin-top:-2px;}.oh{overflow:hidden;}i{font-style:normal;}.color-primary{color:#337ab7;}.color-success{color:#5cb85c;}.color-info{color:#5bc0de;}.color-warning{color:#f0ad4e;}.color-red{color:red;padding:0 3px;}</style><script>jQuery('.qcgzxw-close').click(function() {jQuery('.subscribe-main').fadeOut('slow',function(){jQuery('.subscribe-main').remove();});});</script>";		
 	}
 	$Uploader = get_option('SMMS_DATA'); 
-	$Widget	= $Uploader['Widget']	!== '' ? 'checked="checked"' : '';
+	$Content	= $Uploader['Content']	!== '' ? 'checked="checked"' : '';
 	$Comment	= $Uploader['Comment']	!== '' ? 'checked="checked"' : '';
 	$Donate	= $Uploader['Donate']	!== '' ? 'checked="checked"' : '';
 	
@@ -111,9 +117,15 @@ function my_plugin_options() {
      echo '<form method = "post">';
      echo '<table class = "form-table">';
      echo '<tbody>';
+	 
      echo '<tr valign="top">';
      echo '<th scope="row">启用SM图床小工具</th>';
      echo '<td><label><input value = "true" type = "checkbox" name = "widget" disabled checked>  在 <strong>外观->小工具</strong> 里设置 （默认开启）<a title="关闭插件才能关闭这个功能">[?]</a></label></td>';
+	 echo '</tr>';
+	 
+	 echo '<tr valign="top">';
+     echo '<th scope="row">后台文章编辑启用图片上传</th>';
+     echo '<td><label><input value = "true" type = "checkbox" name = "content" '.$Content.'>  开启后，后台编辑文章是会添加一个图片上传按钮</label></td>';
 	 echo '</tr>';
 	 
 	 echo '<tr valign="top">';
