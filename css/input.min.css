@@ -1,0 +1,13 @@
+/*
+Plugin Name: SM.MS图床外链小工具
+Plugin URI: https://www.qcgzxw.cn/2555.html
+Description: 小文博客独自开发的图床插件，用于WordPress博客添加 图床上传小工具、评论处图片上传按钮、文章编辑处图片上传按钮。
+Author: 小文博客
+Author URI: https://www.qcgzxw.cn/
+Version: 4.0
+License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+自定义小工具CSS样式部分
+*/
+.file{position:relative;display:inline-block;background:#D0EEFF;border:1px solid #99D3F5;border-radius:4px;padding:4px 12px;overflow:hidden;color:#1E88C7;text-decoration:none;text-indent:0;line-height:20px}
+.file input{position:absolute;font-size:100px;right:0;top:0;opacity:0}
+.file:hover{background:#AADFFD;border-color:#78C3F3;color:#004974;text-decoration:none}
