@@ -5,12 +5,12 @@ Plugin URI: https://www.qcgzxw.cn/2555.html
 Description: 小文博客独自开发的图床插件，用于WordPress博客添加 图床上传小工具、评论处图片上传按钮、文章编辑处图片上传按钮。
 Author: 小文博客
 Author URI: https://www.qcgzxw.cn/
-Version: 4.0
+Version: 4.1
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 自定义小工具CSS样式部分
 */
 define( 'SMMS_URL', plugin_dir_url( __FILE__ ) ); 
-define( 'SMMS_VERSION', "4.0");
+define( 'SMMS_VERSION', "4.1");
 define( 'VERSION_CHECK_URL',"https://www.qcgzxw.cn/plugin/?name=qcgzxw_smms");
 include("SMMS-UPLOADER-WIDGETS.php");
 include("SMMS-UPLOADER-COMMENTS.php");
@@ -51,6 +51,15 @@ function donate()
 	echo '<!-- SMMS-UPLOADER-WIDGETS BY QCGZXW.CN -->';
 	wp_enqueue_script( 'smms-donate', SMMS_URL . 'js/donate.js', array(), true, SMMS_VERSION); 
 }
+//插件更新检测
+function update()
+{
+	$response = wp_remote_get( 'https://freed.ga/wp-widgets-info/qcgzxw-smms.json' );
+	if ( is_array( $response ) && !is_wp_error($response) && $response['response']['code'] == '200' ) {
+		$body = json_decode($response['body']);
+	}
+	return $body;
+}
 //添加链接
 add_filter( 'plugin_action_links', 'SMMS_UPLOADER_LINKS', 10, 2 );
 function SMMS_UPLOADER_LINKS( $actions, $plugin_file )
@@ -87,6 +96,22 @@ function my_plugin_menu() {
 
 add_action( 'admin_menu', 'my_plugin_menu' );
 function my_plugin_options() {
+	if(isset($_POST['Update']))
+	{
+		$date = update(); 
+		$ver = $date->ver;
+		if($ver > SMMS_VERSION)
+		{
+			$url = $date->url; 
+			$content = $date->content; 
+			
+			echo '<div class="notice notice-warning"><p>SMMS-UPLOADER 插件已经有新版本啦！ <a target="_blank" href="'.$url.'">立即下载</a></p><p><strong>更新内容：</strong>'.$content.'</p></div>';
+		}
+		else
+		{
+			echo '<div class="updated" id="message"><p>暂无更新</p></div>';
+		}
+	}
 	if(isset($_POST['DataSubmit']))
 	{
 		$Uploader = array( 
@@ -100,8 +125,11 @@ function my_plugin_options() {
 	}
 	else
 	{
-		echo '<div class="updated subscribe-main" id="message"><p>创作不易，给GitHub点个Star吧。——<span class="text-ruo">[<a href="https://github.com/qcgzxw/SMMS-UPLOADER" target="_blank">立即前往</a>]</span><i class="fr fb f20 qcgzxw-close">&#215;</i></p>'; 
-		echo "</div><style>.fb{font-weight:bold;}.f12{font-size:12px;}..f16{font-size:16px;}.f18{font-size:18px;}..fl{float:left;}.fr{float:right;margin-top:-2px;}.oh{overflow:hidden;}i{font-style:normal;}.color-primary{color:#337ab7;}.color-success{color:#5cb85c;}.color-info{color:#5bc0de;}.color-warning{color:#f0ad4e;}.color-red{color:red;padding:0 3px;}</style><script>jQuery('.qcgzxw-close').click(function() {jQuery('.subscribe-main').fadeOut('slow',function(){jQuery('.subscribe-main').remove();});});</script>";		
+		if(!isset($_POST['Update']))
+		{
+			echo '<div class="updated subscribe-main" id="message"><p>创作不易，给GitHub点个Star吧。——<span class="text-ruo">[<a href="https://github.com/qcgzxw/SMMS-UPLOADER" target="_blank">立即前往</a>]</span><i class="fr fb f20 qcgzxw-close">&#215;</i></p>'; 
+			echo "</div><style>.fb{font-weight:bold;}.f12{font-size:12px;}..f16{font-size:16px;}.f18{font-size:18px;}..fl{float:left;}.fr{float:right;margin-top:-2px;}.oh{overflow:hidden;}i{font-style:normal;}.color-primary{color:#337ab7;}.color-success{color:#5cb85c;}.color-info{color:#5bc0de;}.color-warning{color:#f0ad4e;}.color-red{color:red;padding:0 3px;}</style><script>jQuery('.qcgzxw-close').click(function() {jQuery('.subscribe-main').fadeOut('slow',function(){jQuery('.subscribe-main').remove();});});</script>";		
+		}
 	}
 	$Uploader = get_option('SMMS_DATA'); 
 	$Content	= $Uploader['Content']	!== '' ? 'checked="checked"' : '';
@@ -125,7 +153,7 @@ function my_plugin_options() {
 	 
 	 echo '<tr valign="top">';
      echo '<th scope="row">后台文章编辑启用图片上传</th>';
-     echo '<td><label><input value = "true" type = "checkbox" name = "content" '.$Content.'>  开启后，后台编辑文章是会添加一个图片上传按钮</label></td>';
+     echo '<td><label><input value = "true" type = "checkbox" name = "content" '.$Content.'>  勾选后在后台文章编辑处自动添加图片上传按钮</label></td>';
 	 echo '</tr>';
 	 
 	 echo '<tr valign="top">';
@@ -142,7 +170,8 @@ function my_plugin_options() {
 	 echo '</tbody>';
 	 echo '</table>'; 
 	 echo '<p class = "submit">'; 
-	 echo '<input class = "button button-primary" type = "submit" name = "DataSubmit" id = "submit" value = "保存更改" />'; 
+	 echo '<input class = "button button-primary" type = "submit" name = "DataSubmit" id = "submit" value = "保存更改" />&nbsp;&nbsp;&nbsp;&nbsp;'; 
+	 echo '<input class = "button" type = "submit" name = "Update" id = "update" value = "检测更新" />'; 
 	 echo '</p>'; 
 	 
 	 echo '</table>'; 
