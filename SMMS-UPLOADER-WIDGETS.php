@@ -36,7 +36,7 @@ class qcgzxw extends WP_Widget {
 		if($title) $result .= $before_title . $title . $after_title . $before_widget; 
 		echo $result;
 		?>
-			<div class="upload_box" style = "padding: 20px 0 20px 10px">
+			<div class="upload_box">
 			<a href="javascript:;" class="smms-upload-file">选择文件<input type="file" id="image" accept="image/*" multiple="multiple" ></a>
 				<div id = "show" style="widht:100%;height:100%;word-wrap: break-word">
 				<p class = "text-justify" id="urls"></p>
