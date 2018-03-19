@@ -58,7 +58,6 @@ function update()
 	if ( is_array( $response ) && !is_wp_error($response) && $response['response']['code'] == '200' ) {
 		$body = json_decode($response['body']);
 	}
-	print_r($body);
 	return $body;
 }
 //添加链接
