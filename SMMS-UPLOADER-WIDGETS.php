@@ -13,7 +13,6 @@ class qcgzxw extends WP_Widget {
 		 ) 
 		 ); 
 }
- 
     function form( $instance ) {
 		@$title = esc_attr( $instance['title'] );
 		?>
@@ -25,7 +24,6 @@ class qcgzxw extends WP_Widget {
             </p>
 		<?php
     }
- 
     function update( $new_instance, $old_instance ) {       
 		return $new_instance;
     }
@@ -36,7 +34,7 @@ class qcgzxw extends WP_Widget {
 		if($title) $result .= $before_title . $title . $after_title . $before_widget; 
 		echo $result;
 		?>
-			<div class="upload_box" style = "padding: 20px 0 20px 10px">
+			<div class="upload_box">
 			<a href="javascript:;" class="smms-upload-file">选择文件<input type="file" id="image" accept="image/*" multiple="multiple" ></a>
 				<div id = "show" style="widht:100%;height:100%;word-wrap: break-word">
 				<p class = "text-justify" id="urls"></p>
@@ -50,11 +48,8 @@ class qcgzxw extends WP_Widget {
 		echo $after_widget;
     }
 }
-
 function qcgzxw(){
-	// 注册小工具
 	register_widget('qcgzxw');
 }
 add_action('widgets_init','qcgzxw');
-
 ?>
