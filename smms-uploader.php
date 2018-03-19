@@ -5,26 +5,26 @@ Plugin URI: https://www.qcgzxw.cn/2555.html
 Description: 小文博客独自开发的图床插件，用于WordPress博客添加 图床上传小工具、评论处图片上传按钮、文章编辑处图片上传按钮。
 Author: 小文博客
 Author URI: https://www.qcgzxw.cn/
-Version: 4.1
+Version: 4.2
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 自定义小工具CSS样式部分
 */
 define( 'SMMS_URL', plugin_dir_url( __FILE__ ) ); 
-define( 'SMMS_VERSION', "4.1");
-define( 'VERSION_CHECK_URL',"https://www.qcgzxw.cn/plugin/?name=qcgzxw_smms");
+define( 'SMMS_VERSION', "4.2");
+define( 'VERSION_CHECK_URL',"https://freed.ga/wp-widgets-info/qcgzxw-smms.json");
 include("SMMS-UPLOADER-WIDGETS.php");
 include("SMMS-UPLOADER-COMMENTS.php");
 function qcgzxw_scripts_css() {  
 wp_deregister_script('jquery');
-wp_register_script('jquery', SMMS_URL . 'js/jquery.min.js', false, SMMS_VERSION);
+wp_register_script('jquery', SMMS_URL . 'js/jquery.min.js', SMMS_VERSION);
 wp_enqueue_script( 'jquery' );
-wp_enqueue_script( 'smms-js', SMMS_URL . 'js/widget.min.js', array(), true, SMMS_VERSION); 
-if(is_single() || is_page())wp_enqueue_script( 'smms-comment-js', SMMS_URL . 'js/comment.min.js', array(), true, SMMS_VERSION); 
-wp_enqueue_style( 'smms-widget-css', SMMS_URL . 'css/smms.diy.css', array(),SMMS_VERSION); 
-wp_enqueue_style( 'bootstrap', SMMS_URL . 'css/bootstrap.min.css', array(), SMMS_VERSION); 
+if(is_single() || is_page())wp_enqueue_script( 'smms-comment-js', SMMS_URL . 'js/comment.min.js', array(), SMMS_VERSION, true); 
+if(is_single() || is_page() || is_home())wp_enqueue_script( 'smms-js', SMMS_URL . 'js/widget.min.js', array(), SMMS_VERSION, true); 
+if(is_single() || is_page() || is_home())wp_enqueue_style( 'smms-widget-css', SMMS_URL . 'css/smms.diy.css', array(),SMMS_VERSION); 
+if(is_single() || is_page() || is_home())wp_enqueue_style( 'bootstrap', SMMS_URL . 'css/bootstrap.min.css', array(), SMMS_VERSION); 
 }
 function admin_scripts_css() {  
-wp_enqueue_script( 'admin-content-js', SMMS_URL . 'js/content.min.js', array(), true, SMMS_VERSION); 
+wp_enqueue_script( 'admin-content-js', SMMS_URL . 'js/content.min.js', array(), SMMS_VERSION, true); 
 wp_enqueue_style( 'admin-content-css', SMMS_URL . 'css/input.min.css', array(),SMMS_VERSION); 
 }
 add_action('wp_enqueue_scripts', 'qcgzxw_scripts_css');
@@ -49,19 +49,19 @@ if($Uploader['Donate'])
 function donate()
 {
 	echo '<!-- SMMS-UPLOADER-WIDGETS BY QCGZXW.CN -->';
-	wp_enqueue_script( 'smms-donate', SMMS_URL . 'js/donate.js', array(), true, SMMS_VERSION); 
+	wp_enqueue_script( 'smms-donate', SMMS_URL . 'js/donate.js', array(), SMMS_VERSION, true); 
 }
 //插件更新检测
 function update()
 {
-	$response = wp_remote_get( 'https://freed.ga/wp-widgets-info/qcgzxw-smms.json' );
+	$response = wp_remote_get( VERSION_CHECK_URL );
 	if ( is_array( $response ) && !is_wp_error($response) && $response['response']['code'] == '200' ) {
 		$body = json_decode($response['body']);
 	}
+	print_r($body);
 	return $body;
 }
 //添加链接
-add_filter( 'plugin_action_links', 'SMMS_UPLOADER_LINKS', 10, 2 );
 function SMMS_UPLOADER_LINKS( $actions, $plugin_file )
 {
     static $plugin;
@@ -75,6 +75,7 @@ function SMMS_UPLOADER_LINKS( $actions, $plugin_file )
 	}
 	return $actions;
 }
+add_filter( 'plugin_action_links', 'SMMS_UPLOADER_LINKS', 10, 2 );
 //默认数据
 add_action('admin_init', 'SMMS_options_default_options');
 function SMMS_options_default_options(){
@@ -93,7 +94,6 @@ function SMMS_options_default_options(){
 function my_plugin_menu() {
      add_options_page( 'SMMS-UPLOADER设置页面', 'SM图床设置', 'manage_options', 'SMMS-UPLOADER-OPTIONS', 'my_plugin_options' );
 }
-
 add_action( 'admin_menu', 'my_plugin_menu' );
 function my_plugin_options() {
 	if(isset($_POST['Update']))
@@ -148,7 +148,7 @@ function my_plugin_options() {
 	 
      echo '<tr valign="top">';
      echo '<th scope="row">启用SM图床小工具</th>';
-     echo '<td><label><input value = "true" type = "checkbox" name = "widget" disabled checked>  在 <strong>外观->小工具</strong> 里设置 （默认开启）<a title="关闭插件才能关闭这个功能">[?]</a></label></td>';
+     echo '<td><label><input value = "true" type = "checkbox" name = "widget" disabled checked>  在 <strong>外观->小工具</strong> 里设置 （默认开启）<a title="不需要此功能，不添加小工具即可">[?]</a></label></td>';
 	 echo '</tr>';
 	 
 	 echo '<tr valign="top">';
