@@ -31,7 +31,7 @@ class qcgzxw extends WP_Widget {
     function widget( $args, $instance ) {
 		extract( $args );
 		$title = $instance['title'] ? $instance['title'] : 'SM 图床';
-		if($title) $result .= $before_title . $title . $after_title . $before_widget; 
+		if($title) $result .= $before_widget . $before_title . $title . $after_title; 
 		echo $result;
 		?>
 			<div class="upload_box">
