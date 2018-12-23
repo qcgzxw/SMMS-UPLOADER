@@ -5,12 +5,12 @@ Plugin URI: https://www.qcgzxw.cn/2555.html
 Description: 小文博客独自开发的图床插件，用于WordPress博客添加 图床上传小工具、评论处图片上传按钮、文章编辑处图片上传按钮。
 Author: 小文博客
 Author URI: https://www.qcgzxw.cn/
-Version: 4.2
+Version: 4.3
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 自定义小工具CSS样式部分
 */
 define( 'SMMS_URL', plugin_dir_url( __FILE__ ) ); 
-define( 'SMMS_VERSION', "4.2");
+define( 'SMMS_VERSION', "4.3");
 define( 'VERSION_CHECK_URL',"https://freed.ga/wp-widgets-info/qcgzxw-smms.json");
 include("SMMS-UPLOADER-WIDGETS.php");
 include("SMMS-UPLOADER-COMMENTS.php");
