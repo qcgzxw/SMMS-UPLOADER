@@ -1,3 +1,9 @@
+# 官方版
+
+文中插件已不再支持新版SM图床,建议下载官方插件使用
+
+[https://github.com/sb-sb/smms-wordpress-plugin](https://github.com/sb-sb/smms-wordpress-plugin)
+
 # SMMS-UPLOADER
 SM.MS图床外链小工具插件，是小文博客独自开发的图床插件，用于WordPress博客添加图床上传小工具。
 使用SM.MS官方API，图床稳定，支持HTTPS。
